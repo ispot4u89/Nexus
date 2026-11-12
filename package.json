@@ -1,0 +1,17 @@
+{
+  "name": "nexus-cpanel-panel",
+  "version": "1.2.0",
+  "description": "NEXUS VLESS user management panel with backup, restore, bulk proxy import, endpoint checks and Xray chain config builder",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
