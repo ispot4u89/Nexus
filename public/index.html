@@ -1,0 +1,712 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NEXUS — Control Center</title>
+<style>
+:root{color-scheme:dark;--bg:#080b14;--panel:#101626;--line:#222c42;--muted:#8b98b7;--text:#eef2ff;--purple:#8b5cf6;--cyan:#22d3ee;--green:#34d399;--red:#fb7185}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 15% 0%,#1c1740 0,transparent 42%),radial-gradient(ellipse at 90% 15%,#092b3a 0,transparent 32%),var(--bg);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--text);min-height:100vh}
+button,input{font:inherit}button{cursor:pointer}.hidden{display:none!important}
+.shell{max-width:1400px;margin:auto;padding:28px}
+.top,.brand,.toolbar,.sect-head,.hero{display:flex;align-items:center;gap:14px}
+.top,.sect-head,.hero{justify-content:space-between}
+.top{margin-bottom:30px}.brand{gap:13px}.logo{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#8b5cf6,#22d3ee);display:grid;place-items:center;color:#070a12;font-weight:950;font-size:21px;flex-shrink:0}
+.brand h1{font-size:20px;letter-spacing:.18em;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.tag{border:1px solid #275c57;background:#10312e;color:#6ee7b7;padding:7px 11px;border-radius:99px;font-size:11px}
+.hero{align-items:flex-end;margin-bottom:24px}.eyebrow{color:#a78bfa;text-transform:uppercase;letter-spacing:.2em;font-size:10px;font-weight:800}.hero h2{font-size:clamp(26px,4vw,42px);letter-spacing:-.04em;margin:8px 0}.hero p{color:var(--muted);margin:0}
+.btn{border:1px solid #39415a;background:#1a2236;color:var(--text);padding:10px 14px;border-radius:11px;font-weight:700}.btn.primary{background:linear-gradient(135deg,#8b5cf6,#6366f1);border:0}.btn.danger{color:#fda4af;border-color:#653344;background:#301522}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.card,.section{background:linear-gradient(145deg,#121a2cdd,#0d1322f2);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 50px #0002}
+.card{padding:19px}.card-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}.ico{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:#252143;color:#c4b5fd;font-size:17px}
+.metric{font-size:29px;font-weight:800;letter-spacing:-.04em;margin:14px 0 4px}.sub{font-size:11px;color:var(--muted)}
+.section{padding:21px;margin-bottom:18px}.sect-head{margin-bottom:18px;gap:12px}.sect-head h3{margin:0;font-size:16px}.sect-head p{color:var(--muted);font-size:12px;margin:4px 0 0}
+.pill{border:1px solid #3b2d67;background:#251b43;color:#c4b5fd;padding:5px 9px;border-radius:8px;font-size:11px;white-space:nowrap}
+.toolbar{flex-wrap:wrap}.field{background:#080e1b;border:1px solid #2a354c;border-radius:10px;padding:11px 12px;color:var(--text);outline:none;min-width:0;width:100%}.field:focus{border-color:#8b5cf6;box-shadow:0 0 0 3px #8b5cf622}
+.formgrid{display:grid;grid-template-columns:2fr 1.5fr 1fr 1fr auto;gap:10px}
+.field-label{display:block;color:var(--muted);font-size:12px}.field-label .field{margin-top:6px}
+.tablewrap{overflow:auto;border:1px solid #202b40;border-radius:13px}
+table{width:100%;border-collapse:collapse;min-width:800px}
+th{text-align:left;color:#8b98b7;font-size:10px;text-transform:uppercase;letter-spacing:.12em;background:#0a1020;padding:13px}
+td{padding:14px 13px;border-top:1px solid #202a3e;font-size:12px}td strong{font-size:13px}
+.status{display:inline-flex;align-items:center;gap:6px;color:#6ee7b7;font-size:11px}.dot{width:6px;height:6px;background:#34d399;border-radius:99px;box-shadow:0 0 9px #34d39988}
+.smallbtn{background:#151e31;border:1px solid #2a354c;border-radius:8px;color:#d9e2ff;padding:7px 9px;font-size:11px;margin:2px}.smallbtn:hover{border-color:#8b5cf6}
+.empty{text-align:center;color:var(--muted);padding:28px}.login-wrap{max-width:430px;margin:10vh auto;padding:20px}.login{padding:28px}.login h2{letter-spacing:.15em}.login p{color:var(--muted)}.login .field{margin:8px 0 12px}
+.bar{height:6px;background:#253047;border-radius:99px;overflow:hidden;margin-top:9px}.bar span{display:block;height:100%;background:linear-gradient(90deg,#8b5cf6,#22d3ee)}
+.user-admin-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px}.user-admin-tab{width:auto;margin:0;padding:9px 14px;border:1px solid #2a354c;border-radius:10px;background:#101626;color:#cbd5e1}.user-admin-tab.active{border-color:#8b5cf6;background:#292044;color:#fff}.tab-count{display:inline-block;margin-left:7px;opacity:.75;font-size:11px}
+.footer{text-align:center;color:#56627e;font-size:11px;padding:12px}
+.copy-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(12px);background:#10312e;color:#6ee7b7;border:1px solid #275c57;border-radius:12px;padding:12px 18px;max-width:calc(100vw - 32px);text-align:center;z-index:20;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+.copy-toast.visible{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}.copy-toast.error{background:#301522;color:#fda4af;border-color:#653344}
+@media(prefers-reduced-motion:reduce){.copy-toast{transition:none}}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:1fr 1fr}.hero{align-items:flex-start;flex-direction:column}.shell{padding:18px}}
+@media(max-width:520px){.cards{gap:9px}.card{padding:14px}.metric{font-size:24px}.section{padding:14px}.top{align-items:flex-start}.tag{font-size:9px}.formgrid{grid-template-columns:1fr}.sect-head{align-items:flex-start;flex-direction:column}.toolbar{align-items:stretch}.toolbar>.field{width:100%!important}}
+</style>
+</head>
+<body>
+
+<div id="loginView" class="login-wrap">
+  <div class="section login">
+    <div class="brand">
+      <div class="logo">N</div>
+      <div><h1>NEXUS</h1><p>Secure control center</p></div>
+    </div>
+    <h2>WELCOME BACK</h2>
+    <p>Sign in to manage your users and subscriptions.</p>
+    <form id="loginForm">
+      <input id="username" class="field" type="text" placeholder="Administrator username" autocomplete="username" required>
+      <input id="password" class="field" type="password" placeholder="Panel password" autocomplete="current-password" required>
+      <button class="btn primary" style="width:100%">Unlock dashboard →</button>
+    </form>
+    <div id="loginError" class="sub" style="color:#fda4af;margin-top:12px" role="status"></div>
+  </div>
+</div>
+
+<div id="appView" class="shell hidden">
+  <header class="top">
+    <div class="brand">
+      <div class="logo">N</div>
+      <div><h1>NEXUS</h1><p>Proxy infrastructure · Control center</p></div>
+    </div>
+    <div class="toolbar">
+      <span class="tag">● PANEL READY</span>
+      <button id="logout" class="btn">Sign out ↗</button>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div>
+      <div class="eyebrow">OVERVIEW / DASHBOARD</div>
+      <h2>Command your network.</h2>
+      <p>Manage access, subscriptions and user limits from one workspace.</p>
+    </div>
+    <button id="focusCreate" class="btn primary">＋ Create user</button>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div class="card-top"><span>Total users</span><span class="ico">♙</span></div><div id="totalUsers" class="metric">0</div><div class="sub">Accounts in selected view</div></div>
+    <div class="card"><div class="card-top"><span>Active accounts</span><span class="ico">◈</span></div><div id="activeUsers" class="metric">0</div><div class="sub">Enabled and not expired</div></div>
+    <div class="card"><div class="card-top"><span>Traffic consumed</span><span class="ico">⇅</span></div><div id="trafficMetric" class="metric">0 B</div><div class="sub">Counted by the WS relay</div></div>
+    <div class="card"><div class="card-top"><span>Backend status</span><span class="ico">⌁</span></div><div id="backendMetric" class="metric" style="font-size:18px;color:#34d399">WS enabled</div><div id="backendSub" class="sub">WebSocket backend status</div></div>
+  </div>
+
+  <section class="section" id="createSection">
+    <div class="sect-head">
+      <div><h3>＋ Provision a user</h3><p>Create a VLESS identity with quota and validity.</p></div>
+      <span class="pill">USER MANAGEMENT</span>
+    </div>
+    <form id="createForm" class="formgrid">
+      <input id="newName" class="field" placeholder="User name / label" maxlength="60" required>
+      <input id="newUuid" class="field" placeholder="Custom UUID (optional)" autocomplete="off">
+      <input id="newQuota" class="field" type="number" min=".1" max="100000" step=".1" value="50" placeholder="Quota GB" required>
+      <input id="newDays" class="field" type="number" min="1" max="3650" value="30" placeholder="Days" required>
+      <button class="btn primary" type="submit">Create user</button>
+    </form>
+    <p id="createStatus" class="sub" role="status"></p>
+  </section>
+
+  <section class="section">
+    <div class="sect-head">
+      <div><h3>Users & subscriptions</h3><p>Manage account status, quota and VLESS connection links.</p></div>
+      <div class="toolbar">
+        <input id="search" class="field" style="width:220px" placeholder="Search users…">
+        <span id="userCount" class="pill">0 users</span>
+      </div>
+    </div>
+    <div id="userAdminTabs" class="user-admin-tabs" role="tablist" aria-label="Users by administrator"></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>User</th><th>Quota / usage</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="usersBody"></tbody>
+      </table>
+      <div id="empty" class="empty">No users yet. Create your first account above.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sect-head">
+      <div><h3>Connection templates</h3><p>The public hostname is derived from the domain used to open this panel.</p></div>
+      <span class="pill">VLESS · WS</span>
+    </div>
+    <form id="settingsForm" class="formgrid" style="grid-template-columns:2fr 2fr 1fr auto">
+      <label class="field-label">Address<input id="address" class="field" readonly required></label>
+      <label class="field-label">Host / SNI<input id="host" class="field" readonly required></label>
+      <label class="field-label">Port<input id="port" class="field" type="number" min="1" max="65535" value="443" required></label>
+      <button class="btn" type="submit">Save</button>
+    </form>
+    <p class="sub">Server/Address, Host and SNI follow the current panel hostname. WS path: /ws.</p>
+    <p id="settingsStatus" class="sub" role="status"></p>
+  </section>
+
+  <section id="adminManagement" class="section hidden">
+    <div class="sect-head">
+      <div><h3>Administrator management</h3><p>Create separate administrator accounts. Each administrator manages their own users.</p></div>
+      <span class="pill">SUPER ADMIN</span>
+    </div>
+    <form id="adminForm" class="formgrid" style="grid-template-columns:1fr 1fr auto;margin-bottom:18px">
+      <label class="field-label">Username<input id="newAdminUsername" class="field" minlength="3" maxlength="32" autocomplete="off" placeholder="newadmin" required></label>
+      <label class="field-label">Password<input id="newAdminPassword" class="field" type="password" minlength="12" maxlength="256" autocomplete="new-password" placeholder="At least 12 characters" required></label>
+      <button class="btn primary" type="submit">Add administrator</button>
+    </form>
+    <p id="adminStatus" class="sub" role="status"></p>
+    <div class="tablewrap">
+      <table style="min-width:520px">
+        <thead><tr><th>Username</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody id="adminsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sect-head">
+      <div><h3>Backup & restore</h3><p>Download a JSON backup or restore panel data from a previously exported backup.</p></div>
+      <span class="pill">DATA TOOLS</span>
+    </div>
+    <div class="toolbar">
+      <button id="backupButton" class="btn primary" type="button">Download backup</button>
+      <label id="restoreLabel" class="btn" for="restoreFile" style="display:inline-flex;align-items:center;cursor:pointer">Restore JSON backup</label>
+      <input id="restoreFile" type="file" accept=".json,application/json" class="hidden">
+    </div>
+    <p class="sub">Only the super administrator can restore a full backup. Current administrator credentials are preserved during restore.</p>
+    <p id="backupStatus" class="sub" role="status"></p>
+  </section>
+
+  <div class="footer">NEXUS · cPanel Node.js App Deploy · Multi-admin build</div>
+</div>
+
+<div id="modal" class="hidden" style="position:fixed;inset:0;background:#030611cc;place-items:center;padding:18px;z-index:5">
+  <div class="section" style="width:min(760px,100%);max-height:90vh;overflow:auto">
+    <div class="sect-head">
+      <div><h3 id="modalTitle">Configuration links</h3><p>Generated for this user</p></div>
+      <button id="closeModal" class="btn" type="button">✕</button>
+    </div>
+    <div id="modalLinks"></div>
+  </div>
+</div>
+
+<div id="copyToast" class="copy-toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const BASE = '__NEXUS_BASE__';
+
+let state = null;
+let copyToastTimer = null;
+let selectedOwnerId = null;
+
+async function api(url, options = {}) {
+  const response = await fetch(BASE + url, {
+    credentials: 'same-origin',
+    ...options,
+    headers: {
+      ...(options.body ? { 'Content-Type': 'application/json' } : {}),
+      ...(options.headers || {})
+    }
+  });
+
+  let data = {};
+  try { data = await response.json(); } catch {}
+
+  if (!response.ok) throw Error(data.error || 'Request failed');
+  return data;
+}
+
+function esc(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[char]));
+}
+
+function bytes(value) {
+  let number = Number(value) || 0;
+  if (number <= 0) return '0 B';
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let index = 0;
+  while (number >= 1024 && index < units.length - 1) {
+    number /= 1024;
+    index++;
+  }
+  return number.toFixed(index ? 1 : 0) + ' ' + units[index];
+}
+
+function expired(user) {
+  return !Number.isFinite(Date.parse(user.expiresAt)) ||
+    Date.parse(user.expiresAt) <= Date.now();
+}
+
+function currentViewUsers() {
+  const allUsers = state?.users || [];
+  if (state?.currentAdmin?.role !== 'superadmin') return allUsers;
+  const ownerId = selectedOwnerId || state.currentAdmin.id;
+  return allUsers.filter(user =>
+    (user.ownerAdminId || user.ownerId || state.currentAdmin.id) === ownerId
+  );
+}
+
+async function load() {
+  state = await api('/api/state');
+
+  $('loginView').classList.add('hidden');
+  $('appView').classList.remove('hidden');
+
+  $('address').value = state.settings.address || location.hostname;
+  $('host').value = state.settings.host || location.hostname;
+  $('port').value = state.settings.port || 443;
+
+  if (state.currentAdmin?.role === 'superadmin') {
+    const exists = (state.admins || []).some(admin => admin.id === selectedOwnerId);
+    if (!exists) selectedOwnerId = state.currentAdmin.id;
+  } else {
+    selectedOwnerId = state.currentAdmin?.id || null;
+  }
+
+  $('adminManagement').classList.toggle('hidden', state.currentAdmin?.role !== 'superadmin');
+  $('restoreLabel').classList.toggle('hidden', state.currentAdmin?.role !== 'superadmin');
+  $('restoreFile').classList.toggle('hidden', state.currentAdmin?.role !== 'superadmin');
+
+  renderUserAdminTabs();
+  renderUsers();
+  renderAdmins();
+
+  $('backendMetric').textContent = state.backend?.connected ? 'WS enabled' : 'Unavailable';
+  $('backendSub').textContent = state.backend?.message || 'WebSocket status unavailable';
+}
+
+function renderUsers() {
+  const users = currentViewUsers();
+  const query = $('search').value.trim().toLowerCase();
+  const filtered = users.filter(user =>
+    String(user.name || '').toLowerCase().includes(query) ||
+    String(user.uuid || '').toLowerCase().includes(query)
+  );
+
+  $('totalUsers').textContent = users.length;
+  $('activeUsers').textContent = users.filter(user => user.enabled && !expired(user)).length;
+  $('trafficMetric').textContent = bytes(users.reduce((sum, user) =>
+    sum + Number(user.usedBytes || 0), 0
+  ));
+  $('userCount').textContent = `${filtered.length} of ${users.length} users`;
+  $('empty').style.display = filtered.length ? 'none' : 'block';
+
+  $('usersBody').innerHTML = filtered.map(user => {
+    const quotaBytes = Number(user.quotaGB || 0) * 1024 ** 3;
+    const usedBytes = Number(user.usedBytes || 0);
+    const pct = quotaBytes > 0 ? Math.min(100, usedBytes / quotaBytes * 100) : 0;
+    const isActive = user.enabled && !expired(user);
+
+    return `
+      <tr>
+        <td><strong>${esc(user.name)}</strong><div class="sub">${esc(user.uuid)}</div></td>
+        <td>
+          <strong>${Number(user.quotaGB || 0).toLocaleString()} GB</strong>
+          <div class="sub">${bytes(usedBytes)} used · ${pct.toFixed(1)}%</div>
+          <div class="bar"><span style="width:${pct}%"></span></div>
+        </td>
+        <td>${Number.isFinite(Date.parse(user.expiresAt)) ? new Date(user.expiresAt).toLocaleDateString() : '—'}
+          <div class="sub">${expired(user) ? 'Expired' : 'Validity set'}</div>
+        </td>
+        <td>${isActive
+          ? '<span class="status"><span class="dot"></span>Enabled</span>'
+          : '<span style="color:#fda4af">Disabled / expired</span>'}</td>
+        <td>
+          <button class="smallbtn" data-action="links" data-id="${esc(user.id)}">Links</button>
+          <button class="smallbtn" data-action="toggle" data-id="${esc(user.id)}" data-enabled="${!user.enabled}">${user.enabled ? 'Disable' : 'Enable'}</button>
+          <button class="smallbtn" data-action="quota" data-id="${esc(user.id)}" data-quota="${Number(user.quotaGB)}">Quota</button>
+          <button class="smallbtn" data-action="reset" data-id="${esc(user.id)}">Reset</button>
+          <button class="smallbtn" style="color:#fda4af" data-action="delete" data-id="${esc(user.id)}">Delete</button>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function renderUserAdminTabs() {
+  const host = $('userAdminTabs');
+
+  if (state.currentAdmin?.role !== 'superadmin') {
+    host.innerHTML = '';
+    host.style.display = 'none';
+    return;
+  }
+
+  host.style.display = 'flex';
+
+  const admins = (state.admins || []).slice().sort((a, b) => {
+    if (a.role === 'superadmin') return -1;
+    if (b.role === 'superadmin') return 1;
+    return a.username.localeCompare(b.username);
+  });
+
+  host.innerHTML = admins.map(admin => {
+    const count = (state.users || []).filter(user =>
+      (user.ownerAdminId || user.ownerId || state.currentAdmin.id) === admin.id
+    ).length;
+    const active = (selectedOwnerId || state.currentAdmin.id) === admin.id;
+
+    return `<button type="button" role="tab" aria-selected="${active}" class="user-admin-tab${active ? ' active' : ''}" data-owner-id="${esc(admin.id)}">${esc(admin.username)}${admin.role === 'superadmin' ? ' · You' : ''}<span class="tab-count">${count}</span></button>`;
+  }).join('');
+}
+
+function renderAdmins() {
+  if (state.currentAdmin?.role !== 'superadmin') return;
+
+  $('adminsBody').innerHTML = (state.admins || []).map(admin => `
+    <tr>
+      <td>${esc(admin.username)}</td>
+      <td><span class="pill">${admin.role === 'superadmin' ? 'Super admin' : 'Admin'}</span></td>
+      <td>${admin.createdAt && Number.isFinite(Date.parse(admin.createdAt)) ? new Date(admin.createdAt).toLocaleDateString() : '—'}</td>
+      <td>${admin.role === 'superadmin' ? 'Protected' : `<button class="smallbtn" style="color:#fda4af" data-delete-admin="${esc(admin.id)}">Delete</button>`}</td>
+    </tr>`).join('');
+}
+
+$('userAdminTabs').addEventListener('click', event => {
+  const button = event.target.closest('[data-owner-id]');
+  if (!button || state?.currentAdmin?.role !== 'superadmin') return;
+  selectedOwnerId = button.dataset.ownerId;
+  renderUserAdminTabs();
+  renderUsers();
+});
+
+$('usersBody').addEventListener('click', async event => {
+  const button = event.target.closest('[data-action]');
+  if (!button) return;
+
+  const id = button.dataset.id;
+  const action = button.dataset.action;
+  const user = (state.users || []).find(item => item.id === id);
+  if (!user) return;
+
+  if (action === 'links') return showLinks(id);
+  if (action === 'toggle') return toggleUser(id, button.dataset.enabled === 'true');
+  if (action === 'quota') return editQuota(id, Number(button.dataset.quota));
+  if (action === 'reset') return resetUsage(id);
+  if (action === 'delete') return deleteUser(id);
+});
+
+$('adminsBody').addEventListener('click', async event => {
+  const button = event.target.closest('[data-delete-admin]');
+  if (button) await deleteAdmin(button.dataset.deleteAdmin);
+});
+
+$('focusCreate').addEventListener('click', () => {
+  $('newName').focus();
+  $('createSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+$('loginForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('loginError').textContent = '';
+
+  try {
+    await api('/api/login', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: $('username').value.trim(),
+        password: $('password').value
+      })
+    });
+    await load();
+  } catch (error) {
+    $('loginError').textContent = error.message;
+  }
+});
+
+$('logout').addEventListener('click', async () => {
+  try { await api('/api/logout', { method: 'POST' }); } catch {}
+  location.reload();
+});
+
+$('createForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('createStatus').textContent = '';
+
+  const payload = {
+    name: $('newName').value.trim(),
+    quotaGB: $('newQuota').value,
+    days: $('newDays').value,
+    uuid: $('newUuid').value.trim()
+  };
+
+  if (state.currentAdmin?.role === 'superadmin') {
+    payload.ownerAdminId = selectedOwnerId || state.currentAdmin.id;
+  }
+
+  try {
+    await api('/api/users', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    $('newName').value = '';
+    $('newUuid').value = '';
+    $('createStatus').textContent = 'User created successfully.';
+    await load();
+  } catch (error) {
+    $('createStatus').textContent = error.message;
+  }
+});
+
+$('settingsForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('settingsStatus').textContent = '';
+
+  try {
+    await api('/api/settings', {
+      method: 'PATCH',
+      body: JSON.stringify({ port: $('port').value })
+    });
+    $('settingsStatus').textContent = 'Port setting saved.';
+    await load();
+  } catch (error) {
+    $('settingsStatus').textContent = error.message;
+  }
+});
+
+$('adminForm').addEventListener('submit', async event => {
+  event.preventDefault();
+  $('adminStatus').textContent = '';
+
+  try {
+    await api('/api/admins', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: $('newAdminUsername').value.trim(),
+        password: $('newAdminPassword').value
+      })
+    });
+
+    $('newAdminUsername').value = '';
+    $('newAdminPassword').value = '';
+    $('adminStatus').textContent = 'Administrator created.';
+    await load();
+  } catch (error) {
+    $('adminStatus').textContent = error.message;
+  }
+});
+
+async function deleteAdmin(id) {
+  if (!confirm('Delete this administrator? Their users will be transferred to the super administrator.')) return;
+
+  try {
+    await api('/api/admins/' + encodeURIComponent(id), { method: 'DELETE' });
+    selectedOwnerId = state.currentAdmin.id;
+    await load();
+  } catch (error) {
+    $('adminStatus').textContent = error.message;
+  }
+}
+
+async function toggleUser(id, enabled) {
+  try {
+    await api('/api/users/' + encodeURIComponent(id), {
+      method: 'PATCH',
+      body: JSON.stringify({ enabled })
+    });
+    await load();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function editQuota(id, current) {
+  const value = prompt('New quota in GB', String(current));
+  if (value === null) return;
+
+  const quotaGB = Number(value);
+  if (!Number.isFinite(quotaGB) || quotaGB < 0.1 || quotaGB > 100000) {
+    alert('Quota must be between 0.1 and 100000 GB.');
+    return;
+  }
+
+  try {
+    await api('/api/users/' + encodeURIComponent(id), {
+      method: 'PATCH',
+      body: JSON.stringify({ quotaGB })
+    });
+    await load();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function resetUsage(id) {
+  if (!confirm('Reset this user traffic counter to zero?')) return;
+
+  try {
+    await api('/api/users/' + encodeURIComponent(id), {
+      method: 'PATCH',
+      body: JSON.stringify({ resetUsage: true })
+    });
+    await load();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function deleteUser(id) {
+  if (!confirm('Delete this user permanently?')) return;
+
+  try {
+    await api('/api/users/' + encodeURIComponent(id), { method: 'DELETE' });
+    await load();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+$('search').addEventListener('input', renderUsers);
+
+$('backupButton').addEventListener('click', async () => {
+  $('backupStatus').textContent = 'Preparing backup...';
+
+  try {
+    const response = await fetch(BASE + '/api/backup', { credentials: 'same-origin' });
+    if (!response.ok) {
+      let data = {};
+      try { data = await response.json(); } catch {}
+      throw Error(data.error || 'Backup download failed.');
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'nexus-backup.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    $('backupStatus').textContent = 'Backup download started.';
+  } catch (error) {
+    $('backupStatus').textContent = error.message;
+  }
+});
+
+$('restoreFile').addEventListener('change', async event => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  if (!confirm('Restore this backup? Current users and settings will be replaced. Current administrator credentials will be preserved.')) {
+    event.target.value = '';
+    return;
+  }
+
+  $('backupStatus').textContent = 'Restoring backup...';
+
+  try {
+    const backup = JSON.parse(await file.text());
+    const result = await api('/api/restore', {
+      method: 'POST',
+      body: JSON.stringify(backup)
+    });
+
+    $('backupStatus').textContent = `Restore complete. Users: ${result.users}.`;
+    await load();
+  } catch (error) {
+    $('backupStatus').textContent = 'Restore failed: ' + error.message;
+  } finally {
+    event.target.value = '';
+  }
+});
+
+function showLinks(id) {
+  const user = (state.users || []).find(item => item.id === id);
+  if (!user) return;
+
+  $('modalTitle').textContent = user.name + ' · WebSocket configuration';
+
+  const container = document.createElement('div');
+  const description = document.createElement('p');
+  description.className = 'sub';
+  description.textContent = 'VLESS over WebSocket. The server must support WebSocket upgrades and outbound TCP.';
+  const linkBox = document.createElement('div');
+  linkBox.style.cssText = 'padding:12px;background:#080e1b;border:1px solid #27334a;border-radius:10px;overflow-wrap:anywhere;font:11px/1.6 ui-monospace,monospace';
+  const linkText = document.createElement('div');
+  linkText.textContent = user.wsLink || '';
+  const copyButton = document.createElement('button');
+  copyButton.className = 'smallbtn';
+  copyButton.type = 'button';
+  copyButton.textContent = 'Copy link';
+  copyButton.addEventListener('click', () => copyText(user.wsLink || ''));
+  linkBox.append(linkText, copyButton);
+  container.append(description, linkBox);
+
+  $('modalLinks').replaceChildren(container);
+  $('modal').classList.remove('hidden');
+  $('modal').style.display = 'grid';
+}
+
+function closeModal() {
+  $('modal').classList.add('hidden');
+  $('modal').style.display = '';
+}
+
+$('closeModal').addEventListener('click', closeModal);
+$('modal').addEventListener('click', event => {
+  if (event.target === $('modal')) closeModal();
+});
+
+function showCopyToast(message, isError = false) {
+  const toast = $('copyToast');
+  clearTimeout(copyToastTimer);
+  toast.textContent = message;
+  toast.classList.toggle('error', isError);
+  toast.classList.add('visible');
+  copyToastTimer = setTimeout(() => toast.classList.remove('visible'), 2600);
+}
+
+async function copyText(text) {
+  const value = String(text || '');
+  if (!value) {
+    showCopyToast('No link available to copy.', true);
+    return;
+  }
+
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(value);
+      showCopyToast('Link copied successfully.');
+      return;
+    }
+  } catch {}
+
+  const textarea = document.createElement('textarea');
+  textarea.value = value;
+  textarea.readOnly = true;
+  Object.assign(textarea.style, {
+    position: 'fixed',
+    left: '0',
+    top: '0',
+    width: '1px',
+    height: '1px',
+    opacity: '0'
+  });
+
+  document.body.appendChild(textarea);
+  textarea.focus();
+  textarea.select();
+
+  let copied = false;
+  try { copied = document.execCommand('copy'); } catch {}
+
+  textarea.remove();
+
+  if (copied) {
+    showCopyToast('Link copied successfully.');
+  } else {
+    showCopyToast('Automatic copy failed. Copy the link manually.', true);
+    prompt('Copy this link manually:', value);
+  }
+}
+
+api('/api/state').then(load).catch(() => {
+  $('loginView').classList.remove('hidden');
+});
+</script>
+</body>
+</html>
